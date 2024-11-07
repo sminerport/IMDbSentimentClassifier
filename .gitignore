@@ -1,4 +1,9 @@
-.vs/
-WordEmbeddings.pyproj
-WordEmbeddings.sln
+# Ignore data and models directories
 data/
+models/
+glove/
+
+# Ignore other environment or cache files
+__pycache__/
+*.pyc
+*.ipynb_checkpoints
