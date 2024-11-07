@@ -8,6 +8,7 @@ import urllib.request
 import zipfile
 import glob
 import sys
+import re
 
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
@@ -15,6 +16,25 @@ from tensorflow.keras.models import Sequential, load_model
 from tensorflow.keras.layers import Embedding, Bidirectional, LSTM, GlobalMaxPooling1D, Dense, Dropout, BatchNormalization
 from tensorflow.keras.regularizers import l2
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
+
+current_version = re.match(r"(\d+\.\d+\.\d+)", sys.version).group(0)
+
+version_file = "python_version.txt"
+
+if os.path.exists(version_file):
+    with open(version_file, "r") as f:
+        saved_version = f.read().strip()
+
+    if saved_version != f"Python version: {current_version}":
+        print("Python version has changed, updating the version file.")
+        with open(version_file, "w") as f:
+            f.write(f"Python version: {current_version}\n")
+    else:
+        print("Python version is the same, no update needed.")
+else:
+    print("Version file not found, creating a new one.")
+    with open(version_file, "w") as f:
+        f.write(f"Python version: {current_version}\n")
 
 # Create the models directory if it doesn't exist
 models_folder = 'models'
