@@ -1,5 +1,4 @@
 # Ignore data and models directories
-data/
 models/
 glove/
 
