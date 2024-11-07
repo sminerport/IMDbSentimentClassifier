@@ -1,4 +1,3 @@
-# Suppress TensorFlow warnings (must be the first line)
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # Only show errors
 
@@ -8,6 +7,7 @@ import numpy as np
 import urllib.request
 import zipfile
 import glob
+import sys
 
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
@@ -57,11 +57,12 @@ print(f"Size of vocab: {size_of_vocabulary}")
 glove_folder = 'glove'
 os.makedirs(glove_folder, exist_ok=True)
 glove_path = os.path.join(glove_folder, 'glove.6B.100d.txt')
+download_path = os.path.join(glove_folder, "glove.6B.zip")
 
 if not os.path.exists(glove_path):
     print("Downloading GloVe embeddings...")
-    urllib.request.urlretrieve("http://nlp.stanford.edu/data/glove.6B.zip", "glove.6B.zip")
-    with zipfile.ZipFile("glove.6B.zip", 'r') as zip_ref:
+    urllib.request.urlretrieve("http://nlp.stanford.edu/data/glove.6B.zip", download_path)
+    with zipfile.ZipFile(download_path, 'r') as zip_ref:
         zip_ref.extractall(glove_folder)
     print("GloVe embeddings downloaded and extracted.")
 
@@ -91,7 +92,7 @@ model = Sequential()
 
 # Embedding layer with pretrained embeddings
 model.add(Embedding(size_of_vocabulary, embedding_dim, weights=[embedding_matrix],
-                    input_length=100, trainable=False))
+                    trainable=False))
 
 # Bidirectional LSTM with Batch Normalization and Dropout
 model.add(Bidirectional(LSTM(128, return_sequences=True, dropout=0.2)))
@@ -110,10 +111,10 @@ model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['acc'])
 
 # Callbacks
 es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=3)
-mc = ModelCheckpoint('best_model.keras', monitor='val_acc', mode='max',
+mc = ModelCheckpoint(model_path, monitor='val_acc', mode='max',
                      save_best_only=True, verbose=1)
 
-# Model summary
+# Suppress model summary warnings
 print(model.summary())
 
 # Train the model only if best_model.keras doesn't exist
@@ -135,3 +136,14 @@ print(f"Validation Accuracy: {val_acc}")
 # Evaluate on the test set
 _, test_acc = model.evaluate(np.array(x_test_seq), np.array(y_test), batch_size=128)
 print(f"Test Accuracy: {test_acc}")
+
+cleanup = True  # Set to True if you want to delete files after each run
+
+if cleanup:
+    if os.path.exists(model_path):
+        os.remove(model_path)
+        print("Deleted best_model.keras to save space.")
+    
+    if os.path.exists(glove_path):
+        os.remove(glove_path)
+        print("Deleted glove.6B.100d.txt to save space.")
