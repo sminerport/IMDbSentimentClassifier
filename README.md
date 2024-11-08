@@ -5,8 +5,8 @@ This project is a sentiment classifier for IMDb movie reviews. It uses a pre-tra
 ## Features
 
 - Loads IMDb movie reviews for training, validation, and testing.
-- Uses GloVe embeddings for enhanced text representation.
-- Trains a Bidirectional LSTM model to classify reviews as positive or negative.
+- Uses [GloVe embeddings](https://nlp.stanford.edu/projects/glove/) for enhanced text representation.
+- Trains a [Bidirectional LSTM (Long Short-Term Memory)](https://colah.github.io/posts/2015-08-Understanding-LSTMs/) model to classify reviews as positive or negative.
 - Achieves high accuracy on both validation and test sets.
 
 ## Setup
